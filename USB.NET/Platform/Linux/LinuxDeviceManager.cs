@@ -28,15 +28,7 @@ namespace USB.NET.Platform.Linux
             udev_enumerate_add_match_property(udevEnumerator, "DEVTYPE", "usb_device");
             udev_enumerate_scan_devices(udevEnumerator);
 
-            bool tryIterate(udev_list_entry* entry, out udev_list_entry* next)
-            {
-                next = udev_list_entry_get_next(entry);
-                return next != null;
-            }
-            var deviceList = udev_enumerate_get_list_entry(udevEnumerator);
-
-            udev_list_entry* entry = deviceList;
-            while (tryIterate(entry, out entry))
+            for (var entry = udev_enumerate_get_list_entry(udevEnumerator); entry != null; entry = udev_list_entry_get_next(entry))
             {
                 string path = udev_list_entry_get_name(entry);
                 var dev = new LinuxDevice(udev, path);

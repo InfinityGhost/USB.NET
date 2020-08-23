@@ -9,13 +9,10 @@ namespace USB.NET.Platform.Linux
     
     public sealed class LinuxDevice : Device
     {
-        internal unsafe LinuxDevice(udev* udev, string devPath)
+        internal unsafe LinuxDevice(udev_device* udevDevice, string devPath, DeviceDescriptor descriptor)
         {
             InternalFilePath = devPath;
-            var udevDevice = udev_device_new_from_syspath(udev, InternalFilePath);
-            var rawDescriptorPath = udev_device_get_property_value(udevDevice, "DEVNAME");
-            var deviceDescriptor = (DeviceDescriptor)File.ReadAllBytes(rawDescriptorPath)[0..18];
-            SetValues(deviceDescriptor);
+            SetValues(descriptor);
 
             Manufacturer = udev_device_get_sysattr_value(udevDevice, "manufacturer");
             ProductName = udev_device_get_sysattr_value(udevDevice, "product");

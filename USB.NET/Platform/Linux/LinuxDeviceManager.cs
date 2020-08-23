@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using Native.Linux.libudev;
+using USB.NET.Descriptors;
 using USB.NET.Platform.Linux.Exceptions;
 
 namespace USB.NET.Platform.Linux
@@ -31,7 +33,14 @@ namespace USB.NET.Platform.Linux
             for (var entry = udev_enumerate_get_list_entry(udevEnumerator); entry != null; entry = udev_list_entry_get_next(entry))
             {
                 string path = udev_list_entry_get_name(entry);
-                var dev = new LinuxDevice(udev, path);
+                var udevDevice = udev_device_new_from_syspath(udev, path);
+                
+                var rawDescriptorPath = udev_device_get_property_value(udevDevice, "DEVNAME");
+                var deviceDescriptor = (DeviceDescriptor)File.ReadAllBytes(rawDescriptorPath)[0..18];
+                if (deviceDescriptor.bDeviceClass == DeviceClass.Hub)
+                    continue;
+
+                var dev = new LinuxDevice(udevDevice, path, deviceDescriptor);
                 abstractedDevices.Add(dev);
             }
             

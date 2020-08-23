@@ -21,7 +21,7 @@ namespace USB.NET.Descriptors
         public ushort bcdUSB
         {
             set => SetValue(value, 2);
-            get => BitConverter.ToUInt16(Raw[2..3]);
+            get => BitConverter.ToUInt16(Raw[2..4]);
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace USB.NET.Descriptors
         public ushort idVendor
         {
             set => SetValue(value, 8);
-            get => BitConverter.ToUInt16(Raw[8..9]);
+            get => BitConverter.ToUInt16(Raw[8..10]);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace USB.NET.Descriptors
         public ushort idProduct
         {
             set => SetValue(value, 10);
-            get => BitConverter.ToUInt16(Raw[10..11]);
+            get => BitConverter.ToUInt16(Raw[10..12]);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace USB.NET.Descriptors
         public ushort bcdDevice
         {
             set => SetValue(value, 12);
-            get => BitConverter.ToUInt16(Raw[12..13]);
+            get => BitConverter.ToUInt16(Raw[12..14]);
         }
 
         /// <summary>
@@ -131,7 +131,8 @@ namespace USB.NET.Descriptors
 
         public static implicit operator DeviceDescriptor(byte[] raw)
         {
-            return raw[0] == 18 && raw[1] == (byte)DescriptorType.Device ? new DeviceDescriptor(raw) : throw new InvalidCastException();
+            return raw[0] == Size & raw.Length == Size & raw[1] == (byte)DescriptorType.Device ?
+                new DeviceDescriptor(raw) : throw new InvalidCastException();
         }
     }
 }

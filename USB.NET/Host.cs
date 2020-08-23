@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using USB.NET.Platform.Linux;
 using USB.NET.Platform.MacOS;
@@ -6,7 +6,7 @@ using USB.NET.Platform.Windows;
 
 namespace USB.NET
 {
-    public static class System
+    public static class Host
     {
         internal enum RuntimePlatform
         {
@@ -30,13 +30,15 @@ namespace USB.NET
             }
         }
 
-        public static DeviceManager DeviceManager =>
+        public static DeviceManager DeviceManager => deviceManager.Value;
+
+        private static Lazy<DeviceManager> deviceManager = new Lazy<DeviceManager>(() => 
             CurrentPlatform switch
             {
                 RuntimePlatform.Windows => new WindowsDeviceManager(),
                 RuntimePlatform.Linux   => new LinuxDeviceManager(),
                 RuntimePlatform.MacOS   => new MacOSDeviceManager(),
                 _                       => null
-            };
+            });
     }
 }

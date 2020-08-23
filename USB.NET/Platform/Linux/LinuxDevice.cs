@@ -9,7 +9,7 @@ namespace USB.NET.Platform.Linux
     
     public sealed class LinuxDevice : Device
     {
-        internal unsafe LinuxDevice(void* udev, string devPath)
+        internal unsafe LinuxDevice(udev* udev, string devPath)
         {
             InternalFilePath = devPath;
             var udevDevice = udev_device_new_from_syspath(udev, InternalFilePath);

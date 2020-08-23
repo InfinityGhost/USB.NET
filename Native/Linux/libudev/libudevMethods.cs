@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace Native.Linux.libudev
 {
@@ -10,79 +9,79 @@ namespace Native.Linux.libudev
         #region Library Context
             
         [DllImport(libudev)]
-        public static extern void* udev_ref(void* udev);
+        public static extern udev* udev_ref(udev* udev);
 
         [DllImport(libudev)]
-        public static extern void* udev_unref(void* udev);
+        public static extern udev* udev_unref(udev* udev);
 
         [DllImport(libudev)]
-        public static extern void* udev_new();
+        public static extern udev* udev_new();
 
         #endregion
 
         #region Lists
             
         [DllImport(libudev)]
-        public static extern void* udev_list_entry_get_next(void* list_entry);
+        public static extern udev_list_entry* udev_list_entry_get_next(udev_list_entry* list_entry);
 
         [DllImport(libudev)]
-        public static extern void* udev_list_entry_get_by_name(
-            void* list_entry,
+        public static extern udev_list_entry* udev_list_entry_get_by_name(
+            udev_list_entry* list_entry,
             [MarshalAs(UnmanagedType.LPStr)] string name
         );
 
         [DllImport(libudev)]
         [return: MarshalAs(UnmanagedType.LPStr)]
-        public static extern string udev_list_entry_get_name(void* list_entry);
+        public static extern string udev_list_entry_get_name(udev_list_entry* list_entry);
 
         [DllImport(libudev)]
         [return: MarshalAs(UnmanagedType.LPStr)]
-        public static extern string udev_list_entry_get_value(void* list_entry);
+        public static extern string udev_list_entry_get_value(udev_list_entry* list_entry);
 
         #endregion
 
         #region Device
             
         [DllImport(libudev)]
-        public static extern void* udev_device_ref(void* udev_device);
+        public static extern udev_device* udev_device_ref(udev_device* udev_device);
 
         [DllImport(libudev)]
-        public static extern void* udev_device_unref(void* udev_device);
+        public static extern udev_device* udev_device_unref(udev_device* udev_device);
 
         [DllImport(libudev)]
-        public static extern void* udev_device_get_udev(void* udev_device);
+        public static extern udev* udev_device_get_udev(udev_device* udev_device);
 
         [DllImport(libudev)]
-        public static extern void* udev_device_new_from_syspath(
-            void* udev,
+        public static extern udev_device* udev_device_new_from_syspath(
+            udev* udev,
             [MarshalAs(UnmanagedType.LPStr)] string syspath
         );
 
         [DllImport(libudev)]
-        public static extern void* udev_device_new_from_devnum(void* udev, char type, ulong devnum);
+        public static extern udev_device* udev_device_new_from_devnum(udev* udev, char type, ulong devnum);
 
         [DllImport(libudev)]
-        public static extern void* udev_device_new_from_subsystem_sysname(
-            void* udev,
+        public static extern udev_device* udev_device_new_from_subsystem_sysname(
+            udev* udev,
             [MarshalAs(UnmanagedType.LPStr)] string subsystem,
             [MarshalAs(UnmanagedType.LPStr)] string sysname
         );
 
         [DllImport(libudev)]
-        public static extern void* udev_device_new_from_device_id(
-            void* udev,
+        public static extern udev_device* udev_device_new_from_device_id(
+            udev* udev,
             [MarshalAs(UnmanagedType.LPStr)] string id
         );
 
         [DllImport(libudev)]
-        public static extern void* udev_device_new_from_environment(void* udev);
+        public static extern udev_device* udev_device_new_from_environment(udev* udev);
 
         [DllImport(libudev)]
-        public static extern void* udev_device_get_parent(void* udev_device);
+        public static extern udev_device* udev_device_get_parent(udev_device* udev_device);
 
         [DllImport(libudev)]
-        public static extern void* udev_device_get_parent_with_subsystem_devtype(
-            void* udev_device,
+        public static extern udev_device* udev_device_get_parent_with_subsystem_devtype(
+            udev_device* udev_device,
             [MarshalAs(UnmanagedType.LPStr)] string subsystem,
             [MarshalAs(UnmanagedType.LPStr)] string devtype
         );
@@ -93,88 +92,88 @@ namespace Native.Linux.libudev
             
         [DllImport(libudev)]
         [return: MarshalAs(UnmanagedType.LPStr)]
-        public static extern string udev_device_get_devpath(void* udev_device);
+        public static extern string udev_device_get_devpath(udev_device* udev_device);
 
         [DllImport(libudev)]
         [return: MarshalAs(UnmanagedType.LPStr)]
-        public static extern string udev_device_get_subsystem(void* udev_device);
+        public static extern string udev_device_get_subsystem(udev_device* udev_device);
 
         [DllImport(libudev)]
         [return: MarshalAs(UnmanagedType.LPStr)]
-        public static extern string udev_device_get_devtype(void* udev_device);
+        public static extern string udev_device_get_devtype(udev_device* udev_device);
 
         [DllImport(libudev)]
         [return: MarshalAs(UnmanagedType.LPStr)]
-        public static extern string udev_device_get_syspath(void* udev_device);
+        public static extern string udev_device_get_syspath(udev_device* udev_device);
 
         [DllImport(libudev)]
         [return: MarshalAs(UnmanagedType.LPStr)]
-        public static extern string udev_device_get_sysname(void* udev_device);
+        public static extern string udev_device_get_sysname(udev_device* udev_device);
 
         [DllImport(libudev)]
         [return: MarshalAs(UnmanagedType.LPStr)]
-        public static extern string udev_device_get_sysnum(void* udev_device);
+        public static extern string udev_device_get_sysnum(udev_device* udev_device);
 
         [DllImport(libudev)]
         [return: MarshalAs(UnmanagedType.LPStr)]
-        public static extern string udev_device_get_devnode(void* udev_device);
+        public static extern string udev_device_get_devnode(udev_device* udev_device);
 
         [DllImport(libudev)]
-        public static extern int udev_device_get_is_initialized(void* udev_device);
+        public static extern int udev_device_get_is_initialized(udev_device* udev_device);
 
         [DllImport(libudev)]
-        public static extern void* udev_device_get_devlinks_list_entry(void* udev_device);
+        public static extern udev_list_entry* udev_device_get_devlinks_list_entry(udev_device* udev_device);
 
         [DllImport(libudev)]
-        public static extern void* udev_device_get_properties_list_entry(void* udev_device);
+        public static extern udev_list_entry* udev_device_get_properties_list_entry(udev_device* udev_device);
 
         [DllImport(libudev)]
-        public static extern void* udev_device_get_tags_list_entry(void* udev_device);
+        public static extern udev_list_entry* udev_device_get_tags_list_entry(udev_device* udev_device);
 
         [DllImport(libudev)]
-        public static extern void* udev_device_get_sysattr_list_entry(void* udev_device);
+        public static extern udev_list_entry* udev_device_get_sysattr_list_entry(udev_device* udev_device);
 
         [DllImport(libudev)]
         [return: MarshalAs(UnmanagedType.LPStr)]
         public static extern string udev_device_get_property_value(
-            void* udev_device,
+            udev_device* udev_device,
             [MarshalAs(UnmanagedType.LPStr)] string key
         );
 
         [DllImport(libudev)]
         [return: MarshalAs(UnmanagedType.LPStr)]
-        public static extern string udev_device_get_driver(void* udev_device);
+        public static extern string udev_device_get_driver(udev_device* udev_device);
 
         [DllImport(libudev)]
-        public static extern ulong udev_device_get_devnum(void* udev_device);
+        public static extern ulong udev_device_get_devnum(udev_device* udev_device);
 
         [DllImport(libudev)]
         [return: MarshalAs(UnmanagedType.LPStr)]
-        public static extern string udev_device_get_action(void* udev_device);
+        public static extern string udev_device_get_action(udev_device* udev_device);
 
         [DllImport(libudev)]
-        public static extern ulong udev_device_get_seqnum(void* udev_device);
+        public static extern ulong udev_device_get_seqnum(udev_device* udev_device);
 
         [DllImport(libudev)]
-        public static extern ulong udev_device_get_usec_since_initialized(void* udev_device);
+        public static extern ulong udev_device_get_usec_since_initialized(udev_device* udev_device);
 
         [DllImport(libudev)]
         [return: MarshalAs(UnmanagedType.LPStr)]
         public static extern string udev_device_get_sysattr_value(
-            void* udev_device,
+            udev_device* udev_device,
             [MarshalAs(UnmanagedType.LPStr)] string sysattr
         );
 
         [DllImport(libudev)]
         public static extern int udev_device_set_sysattr_value(
-            void* udev_device,
+            udev_device* udev_device,
             [MarshalAs(UnmanagedType.LPStr)] string sysattr,
             [MarshalAs(UnmanagedType.LPStr)] string value
         );
 
         [DllImport(libudev)]
         public static extern int udev_device_has_tag(
-            void* udev_device,
+            udev_device* udev_device,
             [MarshalAs(UnmanagedType.LPStr)] string tag
         );
         
@@ -183,129 +182,129 @@ namespace Native.Linux.libudev
         #region Monitor
             
         [DllImport(libudev)]
-        public static extern void* udev_monitor_ref(void* udev_monitor);
+        public static extern udev_monitor* udev_monitor_ref(udev_monitor* udev_monitor);
 
         [DllImport(libudev)]
-        public static extern void* udev_monitor_unref(void* udev_monitor);
+        public static extern udev_monitor* udev_monitor_unref(udev_monitor* udev_monitor);
 
         [DllImport(libudev)]
-        public static extern void* udev_monitor_get_udev(void* udev_monitor);
+        public static extern udev* udev_monitor_get_udev(udev_monitor* udev_monitor);
 
         [DllImport(libudev)]
-        public static extern void* udev_monitor_new_from_netlink(
-            void* udev,
+        public static extern udev_monitor* udev_monitor_new_from_netlink(
+            udev* udev,
             [MarshalAs(UnmanagedType.LPStr)] string name
         );
 
         [DllImport(libudev)]
-        public static extern int udev_monitor_enable_receiving(void* udev_monitor);
+        public static extern int udev_monitor_enable_receiving(udev_monitor* udev_monitor);
 
         [DllImport(libudev)]
-        public static extern int udev_monitor_set_receive_buffer_size(void* udev_monitor, int size);
+        public static extern int udev_monitor_set_receive_buffer_size(udev_monitor* udev_monitor, int size);
 
         [DllImport(libudev)]
-        public static extern int udev_monitor_get_fd(void* udev_monitor);
+        public static extern int udev_monitor_get_fd(udev_monitor* udev_monitor);
 
         [DllImport(libudev)]
-        public static extern void* udev_monitor_receive_device(void* udev_monitor);
+        public static extern udev_device* udev_monitor_receive_device(udev_monitor* udev_monitor);
 
         [DllImport(libudev)]
         public static extern int udev_monitor_filter_add_match_subsystem_devtype(
-            void* udev_monitor,
+            udev_monitor* udev_monitor,
             [MarshalAs(UnmanagedType.LPStr)] string subsystem,
             [MarshalAs(UnmanagedType.LPStr)] string devtype
         );
 
         [DllImport(libudev)]
         public static extern int udev_monitor_filter_add_match_tag(
-            void* udev_monitor,
+            udev_monitor* udev_monitor,
             [MarshalAs(UnmanagedType.LPStr)] string tag
         );
 
         [DllImport(libudev)]
-        public static extern int udev_monitor_filter_update(void* udev_monitor);
+        public static extern int udev_monitor_filter_update(udev_monitor* udev_monitor);
 
         [DllImport(libudev)]
-        public static extern int udev_monitor_filter_remove(void* udev_monitor);
+        public static extern int udev_monitor_filter_remove(udev_monitor* udev_monitor);
 
         #endregion
         
         #region Enumeration
 
         [DllImport(libudev)]
-        public static extern void* udev_enumerate_ref(void* udev_enumerate);
+        public static extern udev_enumerate* udev_enumerate_ref(udev_enumerate* udev_enumerate);
 
         [DllImport(libudev)]
-        public static extern void* udev_enumerate_unref(void* udev_enumerate);
+        public static extern udev_enumerate* udev_enumerate_unref(udev_enumerate* udev_enumerate);
 
         [DllImport(libudev)]
-        public static extern void* udev_enumerate_get_udev(void* udev_enumerate);
+        public static extern udev* udev_enumerate_get_udev(udev_enumerate* udev_enumerate);
 
         [DllImport(libudev)]
-        public static extern void* udev_enumerate_new(void* udev);
+        public static extern udev_enumerate* udev_enumerate_new(udev* udev);
 
         [DllImport(libudev)]
         public static extern int udev_enumerate_add_match_subsystem(
-            void* udev_enumerator,
+            udev_enumerate* udev_enumerator,
             [MarshalAs(UnmanagedType.LPStr)] string value
         );
 
         [DllImport(libudev)]
         public static extern int udev_enumerate_add_nomatch_subsystem(
-            void* udev_enumerator,
+            udev_enumerate* udev_enumerator,
             [MarshalAs(UnmanagedType.LPStr)] string value
         );
 
         [DllImport(libudev)]
         public static extern int udev_enumerate_add_match_sysattr(
-            void* udev_enumerator, 
+            udev_enumerate* udev_enumerator, 
             [MarshalAs(UnmanagedType.LPStr)] string property, 
             [MarshalAs(UnmanagedType.LPStr)] string value
         );
 
         [DllImport(libudev)]
         public static extern int udev_enumerate_add_nomatch_sysattr(
-            void* udev_enumerator, 
+            udev_enumerate* udev_enumerator, 
             [MarshalAs(UnmanagedType.LPStr)] string property, 
             [MarshalAs(UnmanagedType.LPStr)] string value
         );
 
         [DllImport(libudev)]
         public static extern int udev_enumerate_add_match_property(
-            void* udev_enumerator, 
+            udev_enumerate* udev_enumerator, 
             [MarshalAs(UnmanagedType.LPStr)] string property, 
             [MarshalAs(UnmanagedType.LPStr)] string value
         );
 
         [DllImport(libudev)]
         public static extern int udev_enumerate_add_match_sysname(
-            void* udev_enumerator,
+            udev_enumerate* udev_enumerator,
             [MarshalAs(UnmanagedType.LPStr)] string sysname
         );
 
         [DllImport(libudev)]
         public static extern int udev_enumerate_add_match_tag(
-            void* udev_enumerator,
+            udev_enumerate* udev_enumerator,
             [MarshalAs(UnmanagedType.LPStr)] string tag
         );
 
         [DllImport(libudev)]
-        public static extern int udev_enumerate_add_match_is_initialized(void* udev_enumerate);
+        public static extern int udev_enumerate_add_match_is_initialized(udev_enumerate* udev_enumerate);
 
         [DllImport(libudev)]
         public static extern int udev_enumerate_add_syspath(
-            void* udev_enumerator,
+            udev_enumerate* udev_enumerator,
             [MarshalAs(UnmanagedType.LPStr)] string syspath
         );
 
         [DllImport(libudev)]
-        public static extern int udev_enumerate_scan_devices(void* udev_enumerate);
+        public static extern int udev_enumerate_scan_devices(udev_enumerate* udev_enumerate);
 
         [DllImport(libudev)]
-        public static extern int udev_enumerate_scan_subsystems(void* udev_enumerate);
+        public static extern int udev_enumerate_scan_subsystems(udev_enumerate* udev_enumerate);
 
         [DllImport(libudev)]
-        public static extern void* udev_enumerate_get_list_entry(void* udev_enumerate);
+        public static extern udev_list_entry* udev_enumerate_get_list_entry(udev_enumerate* udev_enumerate);
 
         #endregion
     }

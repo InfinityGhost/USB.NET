@@ -14,7 +14,7 @@ namespace USB.NET.Platform.Linux
         {
         }
 
-        private void* udev = udev_new();
+        private udev* udev = udev_new();
 
         public override IEnumerable<Device> GetAllDevices()
         {
@@ -28,14 +28,14 @@ namespace USB.NET.Platform.Linux
             udev_enumerate_add_match_property(udevEnumerator, "DEVTYPE", "usb_device");
             udev_enumerate_scan_devices(udevEnumerator);
 
-            bool tryIterate(void* entry, out void* next)
+            bool tryIterate(udev_list_entry* entry, out udev_list_entry* next)
             {
                 next = udev_list_entry_get_next(entry);
                 return next != null;
             }
             var deviceList = udev_enumerate_get_list_entry(udevEnumerator);
 
-            void* entry = deviceList;
+            udev_list_entry* entry = deviceList;
             while (tryIterate(entry, out entry))
             {
                 string path = udev_list_entry_get_name(entry);

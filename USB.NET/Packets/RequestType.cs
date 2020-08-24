@@ -1,6 +1,6 @@
 namespace USB.NET.Packets
 {
-    public enum RequestType
+    public enum RequestType : byte
     {
         USB_DIR_OUT = 0,
         USB_DIR_IN = 0x80,

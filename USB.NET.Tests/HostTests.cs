@@ -22,8 +22,8 @@ namespace USB.NET.Tests
             }
         }
 
-        const ushort vid = 0x056A;
-        const ushort pid = 0x030E;
+        const ushort vid = 0x28bd;
+        const ushort pid = 0x0914;
 
         [DataTestMethod]
         [DataRow(vid, pid)]
@@ -42,7 +42,8 @@ namespace USB.NET.Tests
                 WriteLine(device.Manufacturer, "Manufacturer");
                 WriteLine($"{device.VendorID:X4}:{device.ProductID:X4}", "VendorID:ProductID");
                 WriteLine(device.InternalFilePath, "InternalFilePath");
-                WriteLine(device.GetIndexedString(2), "Index[2]");
+                for (byte i = 1; i < 255; i++)
+                    WriteLine(device.GetIndexedString(i), $"Index[{i}]");
             }
         }
     }

@@ -11,6 +11,7 @@ using Native.Linux.Linux.USB;
 
 namespace USB.NET.Platform.Linux
 {
+    using static Tools;
     using static libudevMethods;
     using static libcMethods;
     
@@ -43,10 +44,10 @@ namespace USB.NET.Platform.Linux
 
         public override string GetIndexedString(byte index)
         {
-            var setup = new ControlPacket
+            var setup = new usbfs_ctrltransfer
             {
-                bRequestType = RequestType.USB_DIR_IN,
-                bRequest = Request.GET_DESCRIPTOR,
+                bRequestType = (byte)RequestType.USB_DIR_IN,
+                bRequest = (byte)Request.GET_DESCRIPTOR,
                 wValue = string_index(0),
                 wIndex = 0,
                 wLength = 255
@@ -57,10 +58,8 @@ namespace USB.NET.Platform.Linux
                 setup.data = strbuf;
 
                 var fd = open(devname, oflag.NONBLOCK | oflag.RDWR);
-                if (fd == -1 && ioctl(fd, USBDEVFS_CONTROL, setup) != 0)
-                {
+                if (fd == -1 || ioctl(fd, USBDEVFS_CONTROL, ref setup) == -1)
                     throw CreateIOExceptionFromLastError();
-                }
 
                 setup.wIndex = (ushort)(strbuf[2] | strbuf[3] << 8);
                 setup.wValue = string_index(index);
@@ -68,35 +67,18 @@ namespace USB.NET.Platform.Linux
                 for (int i = 0; i < 256; i++)
                     ((byte*)setup.data)[i] = 0;
 
-                if (ioctl(fd, USBDEVFS_CONTROL, setup) == 0)
+                ioctl(fd, USBDEVFS_CONTROL, ref setup);
+                var sb = new StringBuilder();
+                var retBuf = (char*)setup.data;
+                for (int i = 1; i < 255; i++)
                 {
-                    var sb = new StringBuilder();
-                    var retBuf = (char*)setup.data;
-                    for (int i = 0; i < 255; i++)
-                    {
-                        var c = retBuf[i];
-                        if (c == 0)
-                            break;
-                        sb.Append(c);
-                    }
-                    return sb.ToString();
+                    var c = retBuf[i];
+                    if (c == 0)
+                        break;
+                    sb.Append(c);
                 }
-                else
-                {
-                    throw CreateIOExceptionFromLastError();
-                }
+                return sb.ToString();
             }
-        }
-
-        private static ushort string_index(byte index)
-        {
-            return (ushort)(((byte)DescriptorType.String << 8) | index);
-        }
-
-        private static IOException CreateIOExceptionFromLastError()
-        {
-            var errno = (Error)Marshal.GetLastWin32Error();
-            return new IOException(errno.ToString());
         }
 
         public override void SetConfiguration(uint index, bool enabled)

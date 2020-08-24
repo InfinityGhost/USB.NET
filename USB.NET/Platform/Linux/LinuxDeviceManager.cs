@@ -30,13 +30,18 @@ namespace USB.NET.Platform.Linux
             udev_enumerate_add_match_property(udevEnumerator, "DEVTYPE", "usb_device");
             udev_enumerate_scan_devices(udevEnumerator);
 
+            // Iterate through all USB class devices
             for (var entry = udev_enumerate_get_list_entry(udevEnumerator); entry != null; entry = udev_list_entry_get_next(entry))
             {
+                // Get the USB device in udev
                 string path = udev_list_entry_get_name(entry);
                 var udevDevice = udev_device_new_from_syspath(udev, path);
                 
+                // Grab the device descriptor for parsing
                 var rawDescriptorPath = udev_device_get_property_value(udevDevice, "DEVNAME");
                 var deviceDescriptor = (DeviceDescriptor)File.ReadAllBytes(rawDescriptorPath)[0..18];
+                
+                // Filter out USB hubs, USB controllers, etc. 
                 if (deviceDescriptor.bDeviceClass == DeviceClass.Hub)
                     continue;
 

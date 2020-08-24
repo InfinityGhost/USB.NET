@@ -23,5 +23,6 @@ namespace USB.NET
         public abstract void SetConfiguration(uint index, bool enabled);
         public abstract Configuration GetConfiguration(uint index);
         public abstract string GetIndexedString(byte index);
+        public abstract DeviceDescriptor GetDeviceDescriptor();
     }
 }

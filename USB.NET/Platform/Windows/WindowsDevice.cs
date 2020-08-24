@@ -1,4 +1,6 @@
-﻿namespace USB.NET.Platform.Windows
+﻿using USB.NET.Descriptors;
+
+namespace USB.NET.Platform.Windows
 {
     public sealed class WindowsDevice : Device
     {
@@ -21,6 +23,11 @@
         }
 
         public override Configuration GetConfiguration(uint index)
+        {
+            throw new global::System.NotImplementedException();
+        }
+
+        public override DeviceDescriptor GetDeviceDescriptor()
         {
             throw new global::System.NotImplementedException();
         }

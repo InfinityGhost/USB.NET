@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using USB.NET.Platform.Linux;
-using USB.NET.Platform.MacOS;
-using USB.NET.Platform.Windows;
 
 namespace USB.NET
 {
@@ -35,10 +33,8 @@ namespace USB.NET
         private static Lazy<DeviceManager> deviceManager = new Lazy<DeviceManager>(() => 
             CurrentPlatform switch
             {
-                RuntimePlatform.Windows => new WindowsDeviceManager(),
                 RuntimePlatform.Linux   => new LinuxDeviceManager(),
-                RuntimePlatform.MacOS   => new MacOSDeviceManager(),
-                _                       => null
+                _                       => throw new NotImplementedException()
             });
     }
 }

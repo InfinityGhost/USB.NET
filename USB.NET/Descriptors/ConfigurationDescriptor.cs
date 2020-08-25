@@ -69,5 +69,11 @@ namespace USB.NET.Descriptors
             set => Raw[8] = value;
             get => Raw[8];
         }
+
+        public static implicit operator ConfigurationDescriptor(byte[] raw)
+        {
+            return raw[1] == (byte)DescriptorType.Configuration ?
+                new ConfigurationDescriptor(raw) : throw new InvalidCastException();
+        }
     }
 }

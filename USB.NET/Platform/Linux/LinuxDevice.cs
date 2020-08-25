@@ -46,7 +46,7 @@ namespace USB.NET.Platform.Linux
         {
             var setup = new usbfs_ctrltransfer
             {
-                bRequestType = (byte)RequestType.USB_DIR_IN,
+                bRequestType = (byte)(RequestType.USB_DIR_IN | RequestType.USB_TYPE_STANDARD | RequestType.USB_RECIP_DEVICE),
                 bRequest = (byte)Request.GET_DESCRIPTOR,
                 wValue = string_index(0),
                 wIndex = 0,
@@ -81,19 +81,88 @@ namespace USB.NET.Platform.Linux
             }
         }
 
-        public override void SetConfiguration(uint index, bool enabled)
+        public override void SetConfiguration(ushort index)
         {
-            throw new global::System.NotImplementedException();
+            var setup = new usbfs_ctrltransfer
+            {
+                bRequestType = (byte)(RequestType.USB_DIR_IN | RequestType.USB_TYPE_STANDARD | RequestType.USB_RECIP_DEVICE),
+                bRequest = (byte)Request.SET_CONFIGURATION,
+                wValue = (ushort)index
+            };
+
+            var fd = open(devname, oflag.NONBLOCK | oflag.RDWR);
+            if (fd == -1 || ioctl(fd, USBDEVFS_CONTROL, ref setup) == -1)
+                throw CreateIOExceptionFromLastError();
         }
 
-        public override Configuration GetConfiguration(uint index)
+        public override Configuration GetConfiguration()
         {
-            throw new global::System.NotImplementedException();
+            var setup = new usbfs_ctrltransfer
+            {
+                bRequestType = (byte)(RequestType.USB_DIR_IN | RequestType.USB_TYPE_STANDARD | RequestType.USB_RECIP_DEVICE),
+                bRequest = (byte)Request.GET_CONFIGURATION,
+                wLength = 1
+            };
+
+            var fd = open(devname, oflag.NONBLOCK | oflag.RDWR);
+            if (fd == -1 || ioctl(fd, USBDEVFS_CONTROL, ref setup) == -1)
+                throw CreateIOExceptionFromLastError();
+
+            byte currentConfiguration = (byte)(byte*)setup.data;
+
+            setup = new usbfs_ctrltransfer
+            {
+                bRequestType = (byte)(RequestType.USB_DIR_IN | RequestType.USB_RECIP_DEVICE | RequestType.USB_TYPE_STANDARD),
+                bRequest = (byte)Request.GET_DESCRIPTOR,
+                wValue = (ushort)((byte)DescriptorType.Configuration | currentConfiguration)
+            };
+
+            if (ioctl(fd, USBDEVFS_CONTROL, ref setup) != -1)
+            {
+                var buf = new byte[setup.wLength];
+                fixed (byte* data = buf)
+                    Buffer.MemoryCopy(setup.data, data, setup.wLength, setup.wLength);
+                var descriptor = (ConfigurationDescriptor)(buf);
+            }
+            else
+                throw CreateIOExceptionFromLastError();
+
+            throw new NotImplementedException();
         }
 
         public override DeviceDescriptor GetDeviceDescriptor()
         {
             return this.descriptor;
+        }
+
+        public override void SetFeature(ushort feature)
+        {
+            var setup = new usbfs_ctrltransfer
+            {
+                bRequestType = (byte)(RequestType.USB_DIR_IN | RequestType.USB_RECIP_DEVICE | RequestType.USB_TYPE_STANDARD),
+                bRequest = (byte)Request.SET_FEATURE,
+                wIndex = 0,
+                wValue = feature
+            };
+
+            var fd = open(devname, oflag.NONBLOCK | oflag.RDWR);
+            if (fd != -1 && ioctl(fd, USBDEVFS_CONTROL, ref setup) == -1)
+                throw CreateIOExceptionFromLastError();
+        }
+
+        public override void ClearFeature(ushort feature)
+        {
+            var setup = new usbfs_ctrltransfer
+            {
+                bRequestType = (byte)(RequestType.USB_DIR_IN | RequestType.USB_RECIP_DEVICE | RequestType.USB_TYPE_STANDARD),
+                bRequest = (byte)Request.CLEAR_FEATURE,
+                wIndex = 0,
+                wValue = feature
+            };
+
+            var fd = open(devname, oflag.NONBLOCK | oflag.RDWR);
+            if (fd != -1 && ioctl(fd, USBDEVFS_CONTROL, ref setup) == -1)
+                throw CreateIOExceptionFromLastError();
         }
     }
 }

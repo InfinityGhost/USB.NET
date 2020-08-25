@@ -2,137 +2,77 @@
 
 namespace USB.NET.Descriptors
 {
-    public class DeviceDescriptor : Descriptor
+    public struct DeviceDescriptor
     {
-        public DeviceDescriptor()
-        {
-            Raw = new byte[Size];
-            bLength = Size;
-            bDescriptorType = DescriptorType.Device;
-        }
+        /// <summary>
+        /// Size of this descriptor in bytes
+        /// </summary>
+        public byte bLength;
 
-        private DeviceDescriptor(byte[] value) => Raw = value;
-
-        private const byte Size = 18;
+        /// <summary>
+        /// The current descriptor type
+        /// </summary>
+        public DescriptorType bDescriptorType;
 
         /// <summary>
         /// USB specification release number in binary-coded decimal
         /// </summary>
-        public ushort bcdUSB
-        {
-            set => SetValue(value, 2);
-            get => BitConverter.ToUInt16(Raw[2..4]);
-        }
+        public ushort bcdUSB;
 
         /// <summary>
         /// Class code assigned by the USB-IF
         /// </summary>
-        public DeviceClass bDeviceClass
-        {
-            set => Raw[4] = (byte)value;
-            get => (DeviceClass)Raw[4];
-        }
+        public DeviceClass bDeviceClass;
 
         /// <summary>
         /// Subclass code assigned by the USB-IF
         /// </summary>
-        public byte bDeviceSubClass
-        {
-            set => Raw[5] = value;
-            get => Raw[5];
-        }
+        public byte bDeviceSubClass;
 
         /// <summary>
         /// Protocol code assigned by the USB-IF
         /// </summary>
-        public byte bDeviceProtocol
-        {
-            set => Raw[6] = value;
-            get => Raw[6];
-        }
+        public byte bDeviceProtocol;
 
         /// <summary>
         /// Maximum packet size for endpoint 0
         /// </summary>
         /// <value>8, 16, 32, 64</value>
-        public byte bMaxPacketSize0
-        {
-            set => Raw[7] = value;
-            get => Raw[7];
-        }
+        public byte bMaxPacketSize0;
 
         /// <summary>
         /// Vendor ID assigned by the USB-IF
         /// </summary>
-        public ushort idVendor
-        {
-            set => SetValue(value, 8);
-            get => BitConverter.ToUInt16(Raw[8..10]);
-        }
+        public ushort idVendor;
 
         /// <summary>
         /// Product ID assigned by the manufacturer
         /// </summary>
-        public ushort idProduct
-        {
-            set => SetValue(value, 10);
-            get => BitConverter.ToUInt16(Raw[10..12]);
-        }
+        public ushort idProduct;
 
         /// <summary>
         /// Device release number in binary coded decimal
         /// </summary>
-        public ushort bcdDevice
-        {
-            set => SetValue(value, 12);
-            get => BitConverter.ToUInt16(Raw[12..14]);
-        }
+        public ushort bcdDevice;
 
         /// <summary>
         /// Index of the string descriptor describing the manufacturer
         /// </summary>
-        public byte iManufacturer
-        {
-            set => Raw[14] = value;
-            get => Raw[14];
-        }
+        public byte iManufacturer;
 
         /// <summary>
         /// Index of the string descriptor describing the product
         /// </summary>
-        public byte iProduct
-        {
-            set => Raw[15] = value;
-            get => Raw[15];
-        }
+        public byte iProduct;
 
         /// <summary>
         /// Index of the string descriptor describing the serial number
         /// </summary>
-        public byte iSerialNumber
-        {
-            set => Raw[16] = value;
-            get => Raw[16];
-        }
+        public byte iSerialNumber;
 
         /// <summary>
         /// Index of the string descriptor containing the total amount of configurations
         /// </summary>
-        public byte iNumConfigurations
-        {
-            set => Raw[17] = value;
-            get => Raw[17];
-        }
-
-        public static implicit operator byte[](DeviceDescriptor thisDescriptor)
-        {
-            return (byte[])thisDescriptor.Raw.Clone();
-        }
-
-        public static implicit operator DeviceDescriptor(byte[] raw)
-        {
-            return raw[0] == Size & raw.Length == Size & raw[1] == (byte)DescriptorType.Device ?
-                new DeviceDescriptor(raw) : throw new InvalidCastException();
-        }
+        public byte iNumConfigurations;
     }
 }

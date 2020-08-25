@@ -15,7 +15,7 @@ namespace USB.NET.Platform.Linux
     using static libudevMethods;
     using static libcMethods;
     
-    public unsafe sealed class LinuxDevice : Device
+    internal unsafe sealed class LinuxDevice : Device
     {
         internal unsafe LinuxDevice(udev_device* udevDevice, string devPath, DeviceDescriptor descriptor)
         {
@@ -103,31 +103,31 @@ namespace USB.NET.Platform.Linux
                 bRequest = (byte)Request.GET_CONFIGURATION,
                 wLength = 1
             };
-
+            byte buf = 0;
+            setup.data = &buf;
+            
             var fd = open(devname, oflag.NONBLOCK | oflag.RDWR);
             if (fd == -1 || ioctl(fd, USBDEVFS_CONTROL, ref setup) == -1)
                 throw CreateIOExceptionFromLastError();
 
-            byte currentConfiguration = (byte)(byte*)setup.data;
+            byte currentConfiguration = ((byte*)setup.data)[0];
 
             setup = new usbfs_ctrltransfer
             {
                 bRequestType = (byte)(RequestType.USB_DIR_IN | RequestType.USB_RECIP_DEVICE | RequestType.USB_TYPE_STANDARD),
                 bRequest = (byte)Request.GET_DESCRIPTOR,
-                wValue = (ushort)((byte)DescriptorType.Configuration | currentConfiguration)
+                wValue = (ushort)((byte)DescriptorType.Configuration | currentConfiguration),
             };
+            var descriptor = new ConfigurationDescriptor();
+            setup.data = &descriptor;
 
             if (ioctl(fd, USBDEVFS_CONTROL, ref setup) != -1)
             {
-                var buf = new byte[setup.wLength];
-                fixed (byte* data = buf)
-                    Buffer.MemoryCopy(setup.data, data, setup.wLength, setup.wLength);
-                var descriptor = (ConfigurationDescriptor)(buf);
+                descriptor = *(ConfigurationDescriptor*)setup.data;
+                return new LinuxDeviceConfiguration(descriptor, devname);
             }
             else
                 throw CreateIOExceptionFromLastError();
-
-            throw new NotImplementedException();
         }
 
         public override DeviceDescriptor GetDeviceDescriptor()

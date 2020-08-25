@@ -2,7 +2,7 @@ using USB.NET.Descriptors;
 
 namespace USB.NET.Platform.Linux
 {
-    public sealed class LinuxDeviceConfiguration : Configuration
+    internal sealed class LinuxDeviceConfiguration : Configuration
     {
         internal LinuxDeviceConfiguration(ConfigurationDescriptor descriptor, string devname)
         {

@@ -56,6 +56,8 @@ namespace USB.NET.Tests
                 {
                     WriteDeviceInfo(device);
                     var configuration = device.GetConfiguration();
+                    WriteLine(configuration.ConfigurationValue, "Configuration Value");
+                    WriteLine(configuration.InterfaceCount, "Interface Count");
                 }
                 catch (Exception ex)
                 {

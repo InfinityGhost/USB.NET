@@ -4,17 +4,17 @@ namespace USB.NET.Platform.Linux
 {
     internal sealed class LinuxDeviceConfiguration : Configuration
     {
-        internal LinuxDeviceConfiguration(ConfigurationDescriptor descriptor, string devname)
+        internal LinuxDeviceConfiguration(ConfigurationDescriptor descriptor, string devname, byte[] otherDescriptors = null)
         {
             this.devname = devname;
             this.descriptor = descriptor;
+            this.otherDescriptors = otherDescriptors;
             SetValues(descriptor);
         }
 
         private ConfigurationDescriptor descriptor;
         private string devname;
-
-        public override uint InterfaceCount { protected set; get; }
+        private byte[] otherDescriptors;
 
         public override Interface GetInterface(int index)
         {

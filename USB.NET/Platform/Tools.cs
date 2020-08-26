@@ -15,8 +15,10 @@ namespace USB.NET.Platform.Linux
             return (ushort)(((byte)DescriptorType.String << 8) | index);
         }
 
-        public static IOException CreateIOExceptionFromLastError()
+        public static IOException CreateIOExceptionFromLastError(int fd = -1)
         {
+            if (fd != -1)
+                libcMethods.close(fd);
             var errno = (Error)Marshal.GetLastWin32Error();
             return new IOException(errno.ToString());
         }

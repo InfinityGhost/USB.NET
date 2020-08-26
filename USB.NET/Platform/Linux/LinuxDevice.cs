@@ -17,10 +17,11 @@ namespace USB.NET.Platform.Linux
     
     internal unsafe sealed class LinuxDevice : Device
     {
-        internal unsafe LinuxDevice(udev_device* udevDevice, string devPath, DeviceDescriptor descriptor)
+        internal unsafe LinuxDevice(udev_device* udevDevice, string devPath, DeviceDescriptor descriptor, byte[] otherDescriptors = null)
         {
             InternalFilePath = devPath;
             this.descriptor = descriptor;
+            this.otherDescriptors = otherDescriptors;
             SetValues(descriptor);
 
             var busnum = udev_device_get_sysattr_value(udevDevice, "busnum");
@@ -33,14 +34,7 @@ namespace USB.NET.Platform.Linux
 
         private DeviceDescriptor descriptor;
         private string devname;
-
-        public override ushort VendorID { protected set; get; }
-        public override ushort ProductID { protected set; get; }
-
-        public override string Manufacturer { protected set; get; }
-        public override string ProductName { protected set; get; }
-        public override string SerialNumber { protected set; get; }
-        public override uint ConfigurationCount { protected set; get; }
+        private byte[] otherDescriptors;
 
         public override string GetIndexedString(byte index)
         {
@@ -108,26 +102,23 @@ namespace USB.NET.Platform.Linux
             
             var fd = open(devname, oflag.NONBLOCK | oflag.RDWR);
             if (fd == -1 || ioctl(fd, USBDEVFS_CONTROL, ref setup) == -1)
-                throw CreateIOExceptionFromLastError();
+                throw CreateIOExceptionFromLastError(fd);
+            close(fd);
 
             byte currentConfiguration = ((byte*)setup.data)[0];
-
-            setup = new usbfs_ctrltransfer
+            fixed (byte* configDescriptors = otherDescriptors)
             {
-                bRequestType = (byte)(RequestType.USB_DIR_IN | RequestType.USB_RECIP_DEVICE | RequestType.USB_TYPE_STANDARD),
-                bRequest = (byte)Request.GET_DESCRIPTOR,
-                wValue = (ushort)((byte)DescriptorType.Configuration | currentConfiguration),
-            };
-            var descriptor = new ConfigurationDescriptor();
-            setup.data = &descriptor;
-
-            if (ioctl(fd, USBDEVFS_CONTROL, ref setup) != -1)
-            {
-                descriptor = *(ConfigurationDescriptor*)setup.data;
-                return new LinuxDeviceConfiguration(descriptor, devname);
+                var descriptorPtr = (ConfigurationDescriptor*)configDescriptors;
+                for (int i = 0; i < ConfigurationCount; i++)
+                {
+                    var descriptor = *descriptorPtr;
+                    if (descriptor.bConfigurationValue == currentConfiguration)
+                        return new LinuxDeviceConfiguration(descriptor, devname, otherDescriptors[sizeof(ConfigurationDescriptor)..^1]);
+                    else
+                        descriptorPtr += descriptor.wTotalLength;
+                }
             }
-            else
-                throw CreateIOExceptionFromLastError();
+            throw new Exception("Current configuration not found in cached descriptors.");
         }
 
         public override DeviceDescriptor GetDeviceDescriptor()
@@ -147,7 +138,8 @@ namespace USB.NET.Platform.Linux
 
             var fd = open(devname, oflag.NONBLOCK | oflag.RDWR);
             if (fd != -1 && ioctl(fd, USBDEVFS_CONTROL, ref setup) == -1)
-                throw CreateIOExceptionFromLastError();
+                throw CreateIOExceptionFromLastError(fd);
+            close(fd);
         }
 
         public override void ClearFeature(ushort feature)
@@ -162,7 +154,8 @@ namespace USB.NET.Platform.Linux
 
             var fd = open(devname, oflag.NONBLOCK | oflag.RDWR);
             if (fd != -1 && ioctl(fd, USBDEVFS_CONTROL, ref setup) == -1)
-                throw CreateIOExceptionFromLastError();
+                throw CreateIOExceptionFromLastError(fd);
+            close(fd);
         }
     }
 }

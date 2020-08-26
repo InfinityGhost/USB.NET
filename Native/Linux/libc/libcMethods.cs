@@ -47,6 +47,9 @@ namespace Native.Linux.libc
         );
 
         [DllImport(libc, SetLastError = true)]
+        public static extern int close(int fd);
+
+        [DllImport(libc, SetLastError = true)]
         public static extern int ioctl(int filedes, UIntPtr request, ref usbfs_ctrltransfer value);
 
         public const int IOC_NONE = 0;

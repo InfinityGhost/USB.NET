@@ -8,10 +8,12 @@ namespace USB.NET
     {
         protected void SetValues(ConfigurationDescriptor descriptor)
         {
+            this.ConfigurationValue = descriptor.bConfigurationValue;
             this.InterfaceCount = descriptor.bNumInterfaces;
         }
 
-        public abstract uint InterfaceCount { protected set; get; }
+        public virtual uint ConfigurationValue { protected set; get; }
+        public virtual uint InterfaceCount { protected set; get; }
         public abstract Interface GetInterface(int index);
         
         public abstract ConfigurationDescriptor GetConfigurationDescriptor();

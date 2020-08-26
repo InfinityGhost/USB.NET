@@ -39,15 +39,16 @@ namespace USB.NET.Platform.Linux
                 
                 // Grab the device descriptor for parsing
                 var rawDescriptorPath = udev_device_get_property_value(udevDevice, "DEVNAME");
-                fixed (void* readbuf = File.ReadAllBytes(rawDescriptorPath)[0..18])
+                var descriptors = File.ReadAllBytes(rawDescriptorPath);
+                fixed (void* devDescriptorPtr = descriptors)
                 {
-                    var deviceDescriptor = *(DeviceDescriptor*)readbuf;
+                    DeviceDescriptor deviceDescriptor = *(DeviceDescriptor*)devDescriptorPtr;
                 
                     // Filter out USB hubs, USB controllers, etc. 
                     if (deviceDescriptor.bDeviceClass == DeviceClass.Hub)
                         continue;
 
-                    var dev = new LinuxDevice(udevDevice, path, deviceDescriptor);
+                    var dev = new LinuxDevice(udevDevice, path, deviceDescriptor, descriptors[sizeof(DeviceDescriptor)..^1]);
                     abstractedDevices.Add(dev);
                 }
             }

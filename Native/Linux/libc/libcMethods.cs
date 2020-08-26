@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using Native.Linux.Linux.USB;
+using Native.Linux.Kernel.USB;
 
 namespace Native.Linux.libc
 {

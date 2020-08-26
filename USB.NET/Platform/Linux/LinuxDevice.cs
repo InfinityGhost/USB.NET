@@ -7,11 +7,12 @@ using USB.NET.Packets;
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using Native.Linux.Linux.USB;
+using Native.Linux.Kernel.USB;
 
 namespace USB.NET.Platform.Linux
 {
-    using static Tools;
+    using static Platform.Tools;
+    using static Platform.Linux.Tools;
     using static libudevMethods;
     using static libcMethods;
     
@@ -62,6 +63,8 @@ namespace USB.NET.Platform.Linux
                     ((byte*)setup.data)[i] = 0;
 
                 ioctl(fd, USBDEVFS_CONTROL, ref setup);
+                close(fd);
+                
                 var sb = new StringBuilder();
                 var retBuf = (char*)setup.data;
                 for (int i = 1; i < 255; i++)
@@ -75,18 +78,17 @@ namespace USB.NET.Platform.Linux
             }
         }
 
-        public override void SetConfiguration(ushort index)
+        public override bool SetConfiguration(ushort index)
         {
             var setup = new usbfs_ctrltransfer
             {
                 bRequestType = (byte)(RequestType.USB_DIR_IN | RequestType.USB_TYPE_STANDARD | RequestType.USB_RECIP_DEVICE),
                 bRequest = (byte)Request.SET_CONFIGURATION,
-                wValue = (ushort)index
+                wValue = index
             };
 
-            var fd = open(devname, oflag.NONBLOCK | oflag.RDWR);
-            if (fd == -1 || ioctl(fd, USBDEVFS_CONTROL, ref setup) == -1)
-                throw CreateIOExceptionFromLastError();
+            ControlRequest(devname, setup);
+            return true;
         }
 
         public override Configuration GetConfiguration()
@@ -99,11 +101,7 @@ namespace USB.NET.Platform.Linux
             };
             byte buf = 0;
             setup.data = &buf;
-            
-            var fd = open(devname, oflag.NONBLOCK | oflag.RDWR);
-            if (fd == -1 || ioctl(fd, USBDEVFS_CONTROL, ref setup) == -1)
-                throw CreateIOExceptionFromLastError(fd);
-            close(fd);
+            setup = ControlRequest(devname, setup);
 
             byte currentConfiguration = ((byte*)setup.data)[0];
             fixed (byte* configDescriptors = otherDescriptors)
@@ -136,10 +134,7 @@ namespace USB.NET.Platform.Linux
                 wValue = feature
             };
 
-            var fd = open(devname, oflag.NONBLOCK | oflag.RDWR);
-            if (fd != -1 && ioctl(fd, USBDEVFS_CONTROL, ref setup) == -1)
-                throw CreateIOExceptionFromLastError(fd);
-            close(fd);
+            ControlRequest(devname, setup);
         }
 
         public override void ClearFeature(ushort feature)
@@ -152,10 +147,7 @@ namespace USB.NET.Platform.Linux
                 wValue = feature
             };
 
-            var fd = open(devname, oflag.NONBLOCK | oflag.RDWR);
-            if (fd != -1 && ioctl(fd, USBDEVFS_CONTROL, ref setup) == -1)
-                throw CreateIOExceptionFromLastError(fd);
-            close(fd);
+            ControlRequest(devname, setup);
         }
     }
 }

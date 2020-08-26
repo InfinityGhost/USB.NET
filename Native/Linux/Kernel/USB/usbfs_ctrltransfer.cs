@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Native.Linux.Linux.USB
+namespace Native.Linux.Kernel.USB
 {
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct usbfs_ctrltransfer

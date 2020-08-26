@@ -65,5 +65,25 @@ namespace USB.NET.Tests
                 }
             }
         }
+
+        [TestMethod]
+        public void GetInterfaceTest()
+        {
+            foreach (var device in Host.DeviceManager.GetAllDevices())
+            {
+                try
+                {
+                    WriteDeviceInfo(device);
+                    var configuration = device.GetConfiguration();
+                    var devInterface = configuration.GetInterface();
+                    WriteLine(devInterface.InterfaceValue, "Interface Value");
+                    WriteLine(devInterface.EndpointCount, "Endpoint Count");
+                }
+                catch (Exception ex)
+                {
+                    WriteLine(ex);
+                }
+            }
+        }
     }
 }

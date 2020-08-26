@@ -20,7 +20,7 @@ namespace USB.NET
             ConfigurationCount = descriptor.iNumConfigurations;
         }
 
-        public abstract void SetConfiguration(ushort index);
+        public abstract bool SetConfiguration(ushort index);
         public abstract Configuration GetConfiguration();
 
         public abstract void SetFeature(ushort feature);

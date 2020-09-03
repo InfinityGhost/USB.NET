@@ -107,13 +107,21 @@ namespace USB.NET.Platform.Linux
             fixed (byte* configDescriptors = otherDescriptors)
             {
                 var descriptorPtr = (ConfigurationDescriptor*)configDescriptors;
+                ushort currentDataIndex = 0;
                 for (int i = 0; i < ConfigurationCount; i++)
                 {
                     var descriptor = *descriptorPtr;
                     if (descriptor.bConfigurationValue == currentConfiguration)
-                        return new LinuxDeviceConfiguration(descriptor, devname, otherDescriptors[sizeof(ConfigurationDescriptor)..^1]);
+                    {
+                        var start = currentDataIndex + sizeof(ConfigurationDescriptor);
+                        var end = currentDataIndex + descriptor.wTotalLength - sizeof(ConfigurationDescriptor) - 1;
+                        return new LinuxDeviceConfiguration(descriptor, devname, otherDescriptors[start..end]);
+                    }
                     else
-                        descriptorPtr += descriptor.wTotalLength;
+                    {
+                        descriptorPtr = (ConfigurationDescriptor*)((byte*)descriptorPtr + descriptor.wTotalLength);
+                        currentDataIndex += descriptor.wTotalLength;
+                    }
                 }
             }
             throw new Exception("Current configuration not found in cached descriptors.");

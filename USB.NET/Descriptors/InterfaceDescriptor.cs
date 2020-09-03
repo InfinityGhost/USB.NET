@@ -1,5 +1,8 @@
+using System.Runtime.InteropServices;
+
 namespace USB.NET.Descriptors
 {
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct InterfaceDescriptor
     {
         /// <summary>

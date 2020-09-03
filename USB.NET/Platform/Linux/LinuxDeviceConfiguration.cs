@@ -49,13 +49,20 @@ namespace USB.NET.Platform.Linux
             fixed (byte* interfaceDescriptors = otherDescriptors)
             {
                 var descriptorPtr = (InterfaceDescriptor*)interfaceDescriptors;
+
                 for (int i = 0; i < InterfaceCount; i++)
                 {
                     var descriptor = *descriptorPtr;
                     if (descriptor.bInterfaceNumber == currentInterface)
-                        return new LinuxDeviceInterface(descriptor, devname, otherDescriptors[sizeof(InterfaceDescriptor)..^1]);
+                    {
+                        var start = i * sizeof(InterfaceDescriptor);
+                        var end = start + sizeof(InterfaceDescriptor);
+                        return new LinuxDeviceInterface(descriptor, devname, otherDescriptors[start..end]);
+                    }
                     else
-                        descriptorPtr += descriptor.bLength;
+                    {
+                        descriptorPtr++;
+                    }
                 }
             }
             throw new Exception("Current interface not found in cached descriptors.");

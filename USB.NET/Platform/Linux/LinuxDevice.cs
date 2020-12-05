@@ -54,7 +54,7 @@ namespace USB.NET.Platform.Linux
 
                 var fd = open(devname, oflag.NONBLOCK | oflag.RDWR);
                 if (fd == -1 || ioctl(fd, USBDEVFS_CONTROL, ref setup) == -1)
-                    throw CreateIOExceptionFromLastError();
+                    throw CreateNativeException();
 
                 setup.wIndex = (ushort)(strbuf[2] | strbuf[3] << 8);
                 setup.wValue = string_index(index);
@@ -107,21 +107,22 @@ namespace USB.NET.Platform.Linux
             fixed (byte* configDescriptors = otherDescriptors)
             {
                 var descriptorPtr = (ConfigurationDescriptor*)configDescriptors;
-                ushort currentDataIndex = 0;
+                
+                ushort currentIndex = 0;
                 for (int i = 0; i < ConfigurationCount; i++)
                 {
                     var descriptor = *descriptorPtr;
-                    if (descriptor.bConfigurationValue == currentConfiguration)
+                    if (descriptor.bDescriptorType.HasFlag(DescriptorType.Configuration))
                     {
-                        var start = currentDataIndex + sizeof(ConfigurationDescriptor);
-                        var end = currentDataIndex + descriptor.wTotalLength - sizeof(ConfigurationDescriptor) - 1;
-                        return new LinuxDeviceConfiguration(descriptor, devname, otherDescriptors[start..end]);
+                        if (descriptor.bConfigurationValue == currentConfiguration)
+                        {
+                            var start = currentIndex + sizeof(ConfigurationDescriptor);
+                            var end = currentIndex + descriptor.wTotalLength - sizeof(ConfigurationDescriptor) - 1;
+                            return new LinuxDeviceConfiguration(descriptor, devname, otherDescriptors[start..end]);
+                        }
                     }
-                    else
-                    {
-                        descriptorPtr = (ConfigurationDescriptor*)((byte*)descriptorPtr + descriptor.wTotalLength);
-                        currentDataIndex += descriptor.wTotalLength;
-                    }
+                    descriptorPtr = (ConfigurationDescriptor*)(configDescriptors + descriptor.wTotalLength);
+                    currentIndex += descriptor.wTotalLength;
                 }
             }
             throw new Exception("Current configuration not found in cached descriptors.");

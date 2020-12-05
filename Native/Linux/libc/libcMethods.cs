@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using Native.Linux.Kernel.USB;
+using Native.Linux.sys;
 
 namespace Native.Linux.libc
 {
@@ -49,8 +50,31 @@ namespace Native.Linux.libc
         [DllImport(libc, SetLastError = true)]
         public static extern int close(int fd);
 
+		[DllImport(libc, SetLastError = true)]
+		public static extern int poll(pollfd[] fds, uint nfds, int timeout);
+
+        [DllImport(libc, SetLastError = true)]
+        public static extern int poll(ref pollfd fds, uint nfds, int timeout);
+
+        [DllImport(libc, SetLastError = true)]
+        public static extern int read(
+            int fd,
+            void* buf,
+            uint size
+        );
+        
+        [DllImport(libc, SetLastError = true)]
+        public static extern int write(
+            int fd,
+            void* buf,
+            uint size
+        );
+
         [DllImport(libc, SetLastError = true)]
         public static extern int ioctl(int filedes, UIntPtr request, ref usbfs_ctrltransfer value);
+
+        [DllImport(libc, SetLastError = true)]
+        public static extern int ioctl(int filedes, UIntPtr request, out uint req);
 
         public const int IOC_NONE = 0;
         public const int IOC_WRITE = 1;
@@ -87,7 +111,7 @@ namespace Native.Linux.libc
         }
 
         public const int HID_MAX_DESCRIPTOR_SIZE = 4096;
-        // public static readonly UIntPtr HIDIOCGRDESCSIZE = IOR((byte)'H', 1, 4);
+        public static readonly UIntPtr HIDIOCGRDESCSIZE = IOR((byte)'H', 1, 4);
         public static readonly UIntPtr USBDEVFS_CONTROL = IOWR((byte)'U', 0, Marshal.SizeOf(typeof(usbfs_ctrltransfer)));
         public static UIntPtr HIDIOCGRAWPHYS(int length) => IOR((byte)'H', 5, length);
         public static UIntPtr HIDIOCSFEATURE(int length) => IOWR((byte)'H', 6, length);

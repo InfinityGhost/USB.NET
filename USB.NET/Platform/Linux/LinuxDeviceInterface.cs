@@ -47,7 +47,26 @@ namespace USB.NET.Platform.Linux
                     endpointPaths.Add(sysPath);
             }
 
-            throw new NotImplementedException();
+            fixed (byte* endpointDescriptors = otherDescriptors)
+            {
+                var descriptorPtr = (EndpointDescriptor*)endpointDescriptors;
+
+                int currentIndex = 0;
+                while (currentIndex < otherDescriptors.Length)
+                {
+                    EndpointDescriptor descriptor = *descriptorPtr;
+                    if (descriptor.bDescriptorType.HasFlag(DescriptorType.Endpoint))
+                    {
+                        int endpointNum = descriptor.bEndpointAddress & 0x0f;
+                        bool endpointDirection = (descriptor.bEndpointAddress & (1 << 7)) != 0;
+                        if (endpointNum == index)
+                            return new LinuxDeviceEndpoint(descriptor, endpointPaths[(int)index]);
+                    }
+                    currentIndex += descriptor.bLength;
+                    descriptorPtr = (EndpointDescriptor*)(endpointDescriptors + currentIndex);
+                }
+            }
+            throw new Exception($"Requested endpoint {index} doesn't exist or is not available.");
         }
 
         public override InterfaceDescriptor GetDescriptor()

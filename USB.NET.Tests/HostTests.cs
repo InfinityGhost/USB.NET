@@ -85,5 +85,52 @@ namespace USB.NET.Tests
                 }
             }
         }
+
+        [TestMethod]
+        public void GetEndpointTest()
+        {
+            foreach (var device in Host.DeviceManager.GetAllDevices())
+            {
+                try
+                {
+                    WriteDeviceInfo(device);
+                    var configuration = device.GetConfiguration();
+                    var devInterface = configuration.GetInterface();
+                    var endpoint = devInterface.GetEndpoint(1);
+                    WriteLine(endpoint.GetPath(), "Endpoint hidraw path");
+                }
+                catch (Exception ex)
+                {
+                    WriteLine(ex);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void ReadEndpointTest()
+        {
+            foreach (var device in Host.DeviceManager.GetAllDevices())
+            {
+                try
+                {
+                    var configuration = device.GetConfiguration();
+                    var devInterface = configuration.GetInterface();
+                    var endpoint = devInterface.GetEndpoint(1);
+                    WriteDeviceInfo(device);
+                    using (var fs = endpoint.Open())
+                    {
+                        while (fs.CanRead)
+                        {
+                            var data = fs.Read();
+                            WriteLine(BitConverter.ToString(data));
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    WriteLine(ex);
+                }
+            }
+        }
     }
 }

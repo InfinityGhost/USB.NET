@@ -18,13 +18,13 @@ namespace Native.Windows
         [DllImport("hid.dll", EntryPoint = "HidP_GetCaps", SetLastError = true)]
         public static extern int GetCaps(IntPtr PreparsedData, out HIDP_CAPS Capabilities);
 
-        [DllImport("hid.dll", EntryPoint = "HidD_GetManufacturerString", CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport("hid.dll", EntryPoint = "HidD_GetManufacturerString", CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern bool GetManufacturerString(IntPtr HidDeviceObject, StringBuilder Buffer, int BufferLength);
 
-        [DllImport("hid.dll", EntryPoint = "HidD_GetProductString", CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport("hid.dll", EntryPoint = "HidD_GetProductString", CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern bool GetProductString(IntPtr HidDeviceObject, StringBuilder Buffer, int BufferLength);
 
-        [DllImport("hid.dll", EntryPoint = "HidD_GetSerialNumberString", CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport("hid.dll", EntryPoint = "HidD_GetSerialNumberString", CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern bool GetSerialNumberString(IntPtr HidDeviceObject, StringBuilder Buffer, int BufferLength);
 
         [DllImport("hid.dll", EntryPoint = "HidD_FreePreparsedData", SetLastError = true)]

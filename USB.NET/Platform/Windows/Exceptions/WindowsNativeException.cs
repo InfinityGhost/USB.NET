@@ -1,14 +1,27 @@
+using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 namespace USB.NET.Platform.Windows.Exceptions
 {
-    public class WindowsNativeException : Win32Exception
+    public class WindowsNativeException : Exception
     {
-        public WindowsNativeException(string message)
-            : base(Marshal.GetLastWin32Error(), $"{message}: {Marshal.GetLastWin32Error()}")
+        public WindowsNativeException()
+            : base()
         {
 
+        }
+
+        public WindowsNativeException(string message)
+            : base(FormatMessage(message))
+        {
+
+        }
+
+        private static string FormatMessage(string message)
+        {
+            var err = Marshal.GetLastWin32Error();
+            return $"{message}: {new Win32Exception(err).Message} (Error {err})";
         }
     }
 }

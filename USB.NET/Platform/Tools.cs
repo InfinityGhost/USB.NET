@@ -12,12 +12,18 @@ namespace USB.NET.Platform
             return (ushort)(((byte)DescriptorType.String << 8) | index);
         }
 
-        public static string RetrieveString<T>(int bufferSize, Func<StringBuilder, bool> func, string msg, Action<DelayedException<T>> e) where T : Exception, new()
+        public static T RetrieveString<T>(int bufferSize, out string retrievedString, Func<StringBuilder, T> func)
         {
             var strBuffer = new StringBuilder(bufferSize);
-            if (!func(strBuffer))
-                e(new DelayedException<T>(msg));
+            var ret = func(strBuffer);
+            retrievedString = strBuffer.ToString();
+            return ret;
+        }
 
+        public static string RetrieveString(int bufferSize, Action<StringBuilder> func)
+        {
+            var strBuffer = new StringBuilder(bufferSize);
+            func(strBuffer);
             return strBuffer.ToString();
         }
     }

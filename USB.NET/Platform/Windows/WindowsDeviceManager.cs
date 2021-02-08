@@ -9,14 +9,19 @@ namespace USB.NET.Platform.Windows
     {
         public override IEnumerable<Device> GetAllDevices()
         {
-            using var hidEnumerator = new HIDDeviceEnumerator();
-            using var winUsbEnumerator = new WinUsbDeviceEnumerator();
-            return hidEnumerator.GetDevices().Concat(winUsbEnumerator.GetDevices());
+            return Enumerators.SelectMany(d => d.GetDevices());
         }
+
+        private readonly IDeviceEnumerator[] Enumerators =
+        {
+            new UsbEnumerator(),
+            // new WinUsbEnumerator()
+        };
 
         public void Dispose()
         {
-            
+            foreach (var enumerator in Enumerators)
+                enumerator.Dispose();
         }
     }
 }

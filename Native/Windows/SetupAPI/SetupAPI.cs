@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
+using static Native.Windows.Windows;
 
 namespace Native.Windows
 {
@@ -49,14 +50,5 @@ namespace Native.Windows
 
         [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern unsafe bool SetupDiGetDeviceProperty(IntPtr deviceInfoSet, ref SP_DEVINFO_DATA DeviceInfoData, ref DEVPROPKEY propertyKey, out ulong propertyType, StringBuilder propertyBuffer, int propertyBufferSize, out int requiredSize, uint flags);
-
-        [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        public static extern int CM_Locate_DevNode(ref int pdnDevInst, string pDeviceID, int ulFlags);
-
-        [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        public static extern int CM_Get_Device_ID(int dnDevInst, StringBuilder Buffer, int BufferLen, int ulFlags);
-
-        [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        public static extern int CM_Get_Parent(ref int pdnDevInst, int dnDevInst, int ulFlags);
     }
 }

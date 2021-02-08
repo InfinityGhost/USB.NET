@@ -1,27 +1,30 @@
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using USB.NET.Descriptors;
 using USB.NET.Platform.Windows.Enumerators;
+using static Native.Windows.CfgMgr;
+using static Native.Windows.Windows;
 
 namespace USB.NET.Platform.Windows
 {
-    internal sealed class HIDDevice : Device
+    public sealed class UsbDevice : Device
     {
-        public HIDDevice(string path, Dictionary<int, List<HIDFragment>> hidFragments)
+        public UsbDevice(int devNode)
         {
-            var fragment = hidFragments.Values.First()[0];
-
-            VendorID = fragment.VendorID;
-            ProductID = fragment.ProductID;
-
-            Manufacturer = fragment.Manufacturer;
-            ProductName = fragment.ProductName;
-            SerialNumber = fragment.SerialNumber;
-
-            InternalFilePath = path;
+            CM_Get_Parent(ref parentNode, devNode, 0);
+            Tools.RetrieveString(256, out var manufacturer, s =>
+            {
+                var size = s.Capacity;
+                return CM_Get_DevNode_Property(devNode, ref manufacturerGuid, out _, s, ref size, 0);
+            });
+            Manufacturer = manufacturer;
+            ProductName = "";
+            InternalFilePath = "";
+            Class = UsbEnumerator.GetNodeGuid(devNode);
         }
 
-        private Dictionary<int, List<HIDFragment>> HIDFragments;
+        private Guid Class;
+        private int parentNode;
+        private static DEVPROPKEY manufacturerGuid = DEVPKEY_Device_Manufacturer;
 
         public override void ClearFeature(ushort feature)
         {
